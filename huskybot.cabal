@@ -1,0 +1,20 @@
+Name:                huskybot
+Version:             0.1
+Synopsis:            Codecamp reference bot
+License:             BSD3
+License-file:        LICENSE
+Author:              Juha Paananen
+Maintainer:          juha.paananen@gmail.com
+Category:            Game
+Build-type:          Simple
+Cabal-version:       >=1.2
+
+
+Executable huskybot
+   Main-is: Main.hs
+   hs-source-dirs: src
+   Build-depends:
+      base >= 4 && < 5,
+      HTTP == 4000.2.2,
+      json == 0.5
+
