@@ -1,6 +1,6 @@
 import System.Environment(getArgs)
 
-import Network.Socket
+import Network
 import System.IO
 
 import Text.JSON
@@ -8,7 +8,7 @@ import Text.JSON
 main = getArgs >>= huskyBot
 
 huskyBot [host, port, name] = do
-  handle <- connectSocket host port
+  handle <- connectSocket host (read port)
   let json = encode $ toJSObject [("msgType", "join"), ("data", name)]
   hPutStrLn handle json
   hFlush handle
@@ -17,15 +17,7 @@ huskyBot [host, port, name] = do
 
 huskyBot _ = putStrLn "USAGE : huskybot <host> <port> <name>"
 
-connectSocket host port = do
-  addrinfos <- getAddrInfo Nothing (Just host) (Just port)
-  let serveraddr = head addrinfos
-  sock <- socket (addrFamily serveraddr) Stream defaultProtocol
-  setSocketOption sock KeepAlive 1
-  connect sock (addrAddress serveraddr)
-  h <- socketToHandle sock ReadWriteMode
-  hSetBuffering h (BlockBuffering Nothing)
-  return h
+connectSocket host port = connectTo host (PortNumber $ fromInteger port)
 
 dumpStuff handle = do
   msg <- hGetLine handle
