@@ -15,6 +15,6 @@ Executable huskybot
    hs-source-dirs: src
    Build-depends:
       base >= 4 && < 5,
-      HTTP == 4000.2.2,
+      network == 2.3.0.8,
       json == 0.5
 

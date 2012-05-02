@@ -1,22 +1,33 @@
 import System.Environment(getArgs)
-import Network.TCP(openTCPPort)
-import Network.Stream
+
+import Network.Socket
+import System.IO
+
 import Text.JSON
 
 main = getArgs >>= huskyBot
 
 huskyBot [name] = do
-  conn <- openTCPPort "localhost" 8090
+  handle <- connectSocket "localhost" 8090
   let json = encode $ toJSObject [("msgType", "join"), ("data", name)]
-  writeBlock conn json
+  hPutStrLn handle json
+  hFlush handle
   putStrLn $ ">> " ++ json
-  dumpStuff conn
+  dumpStuff handle
 
 huskyBot _ = putStrLn "USAGE : huskybot <name>"
 
-dumpStuff conn = do
-  result <- readLine conn
-  case result of
-    Left err -> fail (show err)
-    Right msg -> putStrLn $ "<< " ++ msg
-  dumpStuff conn
+connectSocket host port = do
+  addrinfos <- getAddrInfo Nothing (Just host) (Just (show port))
+  let serveraddr = head addrinfos
+  sock <- socket (addrFamily serveraddr) Stream defaultProtocol
+  setSocketOption sock KeepAlive 1
+  connect sock (addrAddress serveraddr)
+  h <- socketToHandle sock WriteMode
+  hSetBuffering h (BlockBuffering Nothing)
+  return h
+
+dumpStuff handle = do
+  msg <- hGetLine handle
+  putStrLn $ "<< " ++ msg
+  dumpStuff handle
