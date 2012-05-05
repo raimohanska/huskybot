@@ -1,1 +1,1 @@
-ghci -isrc:src -isrc:test
+ghci -isrc:src -isrc:test -hide-package aeson-native
